@@ -31,7 +31,6 @@ internal static partial class NetHost
     /// The full search for the hostfxr library is done on every call. To minimize the need
     /// to call this function multiple times, pass a large buffer (e.g. PATH_MAX).
     /// </remarks>
-#if !NET7_0_OR_GREATER
     private static unsafe int GetHostFxrPath(Span<byte> buffer, ref nint buffer_size, nint parameters)
     {
         fixed (nint* buffer_size_native = &buffer_size)
@@ -41,10 +40,6 @@ internal static partial class NetHost
         [DllImport("nethost", EntryPoint = "get_hostfxr_path", ExactSpelling = true)]
         static extern unsafe int __PInvoke(byte* buffer_native, nint* buffer_size_native, nint parameters_native);
     }
-#else
-    [LibraryImport("nethost", EntryPoint = "get_hostfxr_path")]
-    private static partial int GetHostFxrPath(Span<byte> buffer, ref nint buffer_size, nint parameters);
-#endif
 
     public static string GetHostFxrPath()
     {
