@@ -10,29 +10,23 @@ internal sealed class HostFxr(string path) : IDisposable
     public const int Success_DifferentRuntimeProperties = 2;
 
     private readonly nint _handle = NativeLibrary.Load(path);
-
-    private unsafe delegate* unmanaged[Cdecl]<int, char**, InitializeParameters*, out nint, int> _hostfxr_initialize_for_dotnet_command_line;
-    private unsafe delegate* unmanaged[Cdecl]<char*, InitializeParameters*, out nint, int> _hostfxr_initialize_for_runtime_config;
-    private unsafe delegate* unmanaged[Cdecl]<nint, int> _hostfxr_run_app;
-    private unsafe delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int> _hostfxr_get_runtime_delegate;
-    private unsafe delegate* unmanaged[Cdecl]<nint, int> _hostfxr_close;
     private bool _disposedValue;
 
-    public unsafe delegate* unmanaged[Cdecl]<int, char**, InitializeParameters*, out nint, int> InitializeForDotnetCommandLine => _hostfxr_initialize_for_dotnet_command_line == null
-            ? _hostfxr_initialize_for_dotnet_command_line = (delegate* unmanaged[Cdecl]<int, char**, InitializeParameters*, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_initialize_for_dotnet_command_line")
-            : _hostfxr_initialize_for_dotnet_command_line;
-    public unsafe delegate* unmanaged[Cdecl]<char*, InitializeParameters*, out nint, int> InitializeForRuntimeConfig => _hostfxr_initialize_for_runtime_config == null
-            ? _hostfxr_initialize_for_runtime_config = (delegate* unmanaged[Cdecl]<char*, InitializeParameters*, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_initialize_for_runtime_config")
-            : _hostfxr_initialize_for_runtime_config;
-    public unsafe delegate* unmanaged[Cdecl]<nint, int> RunApp => _hostfxr_run_app == null
-            ? _hostfxr_run_app = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_run_app")
-            : _hostfxr_run_app;
-    public unsafe delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int> GetRuntimeDelegate => _hostfxr_get_runtime_delegate == null
-            ? _hostfxr_get_runtime_delegate = (delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_get_runtime_delegate")
-            : _hostfxr_get_runtime_delegate;
-    public unsafe delegate* unmanaged[Cdecl]<nint, int> Close => _hostfxr_close == null
-            ? _hostfxr_close = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_close")
-            : _hostfxr_close;
+    public unsafe delegate* unmanaged[Cdecl]<int, byte**, InitializeParametersStruct*, out nint, int> InitializeForDotnetCommandLine => field == null
+        ? field = (delegate* unmanaged[Cdecl]<int, byte**, InitializeParametersStruct*, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_initialize_for_dotnet_command_line")
+        : field;
+    public unsafe delegate* unmanaged[Cdecl]<byte*, InitializeParametersStruct*, out nint, int> InitializeForRuntimeConfig => field == null
+        ? field = (delegate* unmanaged[Cdecl]<byte*, InitializeParametersStruct*, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_initialize_for_runtime_config")
+        : field;
+    public unsafe delegate* unmanaged[Cdecl]<nint, int> RunApp => field == null
+        ? field = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_run_app")
+        : field;
+    public unsafe delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int> GetRuntimeDelegate => field == null
+        ? field = (delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_get_runtime_delegate")
+        : field;
+    public unsafe delegate* unmanaged[Cdecl]<nint, int> Close => field == null
+        ? field = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_close")
+        : field;
 
     private void Dispose(bool disposing)
     {
@@ -117,7 +111,5 @@ file static class NativeLibrary
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
         static extern nint GetProcAddress(nint hModule, string lpProcName);
     }
-
-
 }
 #endif
