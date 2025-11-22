@@ -1,0 +1,28 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <NetHostDir>$(NetCoreTargetingPackRoot)\Microsoft.NETCore.App.Host.$(NETCoreSdkRuntimeIdentifier)\$(BundledNETCoreAppPackageVersion)\runtimes\$(NETCoreSdkRuntimeIdentifier)\native</NetHostDir>
+    <NetHostStaticName Condition="$([MSBuild]::IsOsPlatform('Windows'))">libnethost.lib</NetHostStaticName>
+    <NetHostStaticName Condition="!$([MSBuild]::IsOsPlatform('Windows'))">libnethost.a</NetHostStaticName>
+    <NetHostName Condition="$([MSBuild]::IsOsPlatform('Windows'))">nethost.dll</NetHostName>
+    <NetHostName Condition="$([MSBuild]::IsOsPlatform('OSX'))">libnethost.dylib</NetHostName>
+    <NetHostName Condition="!$([MSBuild]::IsOsPlatform('Windows')) and !$([MSBuild]::IsOsPlatform('OSX'))">libnethost.so</NetHostName>
+  </PropertyGroup>
+
+  <!-- These two ItemGroups are for static linking publishing as NativeAOT. -->
+  <ItemGroup>
+    <NativeLibrary Include="$(NetHostDir)\$(NetHostStaticName)" />
+    <DirectPInvoke Include="nethost" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="!$([MSBuild]::IsOsPlatform('Windows'))">
+    <!-- This is needed by libnethost.a. -->
+    <LinkerArg Include="-lstdc++" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(NetHostDir)\$(NetHostStaticName)" Link="$(NetHostStaticName)" />
+    <None Include="$(NetHostDir)\$(NetHostName)" Link="$(NetHostName)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

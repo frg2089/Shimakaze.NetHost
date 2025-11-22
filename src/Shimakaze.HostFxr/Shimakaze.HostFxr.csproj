@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.Build.NoTargets">
+
+  <ItemGroup>
+    <Compile Include="*.cs" Pack="true" PackagePath="contentFiles\any\any\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="HostFxr.props" Pack="true" PackagePath="build\$(PackageId).props" />
+    <None Include="HostFxr.props" Pack="true" PackagePath="buildTransitive\$(PackageId).props" />
+  </ItemGroup>
+
+</Project>
