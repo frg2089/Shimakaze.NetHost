@@ -8,8 +8,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Include="NetHost.props" Pack="true" PackagePath="build\$(PackageId).props" />
-    <None Include="NetHost.props" Pack="true" PackagePath="buildTransitive\$(PackageId).props" />
+    <None Include="NetHost.targets" Pack="true" PackagePath="build\$(PackageId).targets" />
+    <None Include="NetHost.targets" Pack="true" PackagePath="buildTransitive\$(PackageId).targets" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition=" '$(NoTarget)' != 'true' " />

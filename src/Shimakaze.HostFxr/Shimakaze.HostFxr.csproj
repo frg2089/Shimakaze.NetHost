@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="HostFxr.props" Pack="true" PackagePath="build\$(PackageId).props" />
-    <None Include="HostFxr.props" Pack="true" PackagePath="buildTransitive\$(PackageId).props" />
+    <None Include="HostFxr.targets" Pack="true" PackagePath="build\$(PackageId).targets" />
+    <None Include="HostFxr.targets" Pack="true" PackagePath="buildTransitive\$(PackageId).targets" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition=" '$(NoTarget)' != 'true' " />
