@@ -1,14 +1,9 @@
 ﻿namespace Shimakaze;
 
-internal sealed record class InitializeParameters(TString? HostPath, TString? DotnetRoot)
+public unsafe struct InitializeParameters()
 {
-    public unsafe void ToStruct(ref InitializeParametersStruct initializeParameters)
-    {
-        initializeParameters = new()
-        {
-            Size = unchecked((nuint)sizeof(InitializeParametersStruct)),
-            HostPath = HostPath,
-            DotnetRoot = DotnetRoot,
-        };
-    }
+    public nuint Size = unchecked((nuint)(sizeof(nint) * 3));
+    public byte* HostPath = null;
+    public byte* DotnetRoot = null;
 }
+public sealed record class SafeInitializeParameters(string HostPath, string DotnetRoot);

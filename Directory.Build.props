@@ -1,13 +1,9 @@
 ﻿<Project>
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(NoTarget)' != 'true' ">
-      net10.0;net9.0;net8.0;net7.0;net6.0;net5.0;
-      netcoreapp3.1;netcoreapp3.0;
-      net48;net472;net471;net47;net462;net461;
-      netstandard2.0;netstandard2.1
-    </TargetFrameworks>
-    <TargetFramework Condition=" '$(NoTarget)' == 'true' ">netstandard2.0</TargetFramework>
+    <_IsPacking>$(NoTarget)</_IsPacking>
+    <_IsPacking Condition=" '$(MSBuildProjectName)' == 'Shimakaze.HostFxr' ">false</_IsPacking>
+    <_IsPacking Condition=" '$(_IsPacking)' == '' ">false</_IsPacking>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
@@ -42,8 +38,5 @@
     <None Include="$(ReadmeFile)" Link="ReadMe.md" Condition=" '$(ReadmeFile)' != '' " Pack="True" PackagePath="\" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(NoTarget)' == 'true' ">
-    <Compile Include="$(MSBuildProjectDirectory)\*.cs" Pack="true" PackagePath="contentFiles\cs\netstandard2.0\$(PackageId)\" />
-  </ItemGroup>
   
 </Project>

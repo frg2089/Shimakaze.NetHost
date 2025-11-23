@@ -1,6 +1,6 @@
 ﻿namespace Shimakaze;
 
-internal enum DelegateType
+public enum DelegateType
 {
     ComActivation,
     LoadInMemoryAssembly,

@@ -1,115 +1,80 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Shimakaze;
 
-internal sealed class HostFxr(string path) : IDisposable
+public sealed class HostFxr(nint handle) : SafeHandleZeroIsInvalid(handle)
 {
     public const int Success = 0;
     public const int Success_HostAlreadyInitialized = 1;
     public const int Success_DifferentRuntimeProperties = 2;
 
-    private readonly nint _handle = NativeLibrary.Load(path);
-    private bool _disposedValue;
+    // hostfxr_get_available_sdks
+    // hostfxr_get_native_search_directories
+    // hostfxr_resolve_sdk
+    // hostfxr_resolve_sdk2
+    public new unsafe delegate* unmanaged[Cdecl]<nint, int> Close => field != null ? field : field = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(handle, "hostfxr_close");
+    public unsafe delegate* unmanaged[Cdecl]<DotnetEnvironmentInfo*, void*, void> GetDotnetEnvironmentInfoResult => field != null ? field : field = (delegate* unmanaged[Cdecl]<DotnetEnvironmentInfo*, void*, void>)NativeLibrary.GetExport(handle, "hostfxr_get_dotnet_environment_info");
+    public unsafe delegate* unmanaged[Cdecl]<nint, DelegateType, out void**, int> GetRuntimeDelegate => field != null ? field : field = (delegate* unmanaged[Cdecl]<nint, DelegateType, out void**, int>)NativeLibrary.GetExport(handle, "hostfxr_get_runtime_delegate");
+    public unsafe delegate* unmanaged[Cdecl]<nint, ref nuint, out byte**, out byte**, int> GetRuntimeProperties => field != null ? field : field = (delegate* unmanaged[Cdecl]<nint, ref nuint, out byte**, out byte**, int>)NativeLibrary.GetExport(handle, "hostfxr_get_runtime_properties");
+    public unsafe delegate* unmanaged[Cdecl]<nint, byte*, out byte**, int> GetRuntimePropertyValue => field != null ? field : field = (delegate* unmanaged[Cdecl]<nint, byte*, out byte**, int>)NativeLibrary.GetExport(handle, "hostfxr_get_runtime_property_value");
+    public unsafe delegate* unmanaged[Cdecl]<int, byte**, InitializeParameters*, out nint, int> InitializeForDotnetCommandLine => field != null ? field : field = (delegate* unmanaged[Cdecl]<int, byte**, InitializeParameters*, out nint, int>)NativeLibrary.GetExport(handle, "hostfxr_initialize_for_dotnet_command_line");
+    public unsafe delegate* unmanaged[Cdecl]<byte*, InitializeParameters*, out nint, int> InitializeForRuntimeConfig => field != null ? field : field = (delegate* unmanaged[Cdecl]<byte*, InitializeParameters*, out nint, int>)NativeLibrary.GetExport(handle, "hostfxr_initialize_for_runtime_config");
+    public unsafe delegate* unmanaged[Cdecl]<int, byte**, int> Main => field != null ? field : field = (delegate* unmanaged[Cdecl]<int, byte**, int>)NativeLibrary.GetExport(handle, "hostfxr_main");
+    public unsafe delegate* unmanaged[Cdecl]<int, byte**, byte*, byte*, byte*, long, int> MainBundleStartupinfo => field != null ? field : field = (delegate* unmanaged[Cdecl]<int, byte**, byte*, byte*, byte*, long, int>)NativeLibrary.GetExport(handle, "hostfxr_main_bundle_startupinfo");
+    public unsafe delegate* unmanaged[Cdecl]<int, byte**, byte*, byte*, byte*, int> MainStartupinfo => field != null ? field : field = (delegate* unmanaged[Cdecl]<int, byte**, byte*, byte*, byte*, int>)NativeLibrary.GetExport(handle, "hostfxr_main_startupinfo");
+    public unsafe delegate* unmanaged[Cdecl]<byte*, /*opt*/ InitializeParameters*, /*opt*/ delegate* unmanaged[Cdecl]<ResolveFrameworksResult*, void*, void>, /*opt*/ void*, int> ResolveFrameworksForRuntimeConfig => field != null ? field : field = (delegate* unmanaged[Cdecl]<byte*, InitializeParameters*, delegate* unmanaged[Cdecl]<ResolveFrameworksResult*, void*, void>, void*, int>)NativeLibrary.GetExport(handle, "hostfxr_resolve_frameworks_for_runtime_config");
+    public unsafe delegate* unmanaged[Cdecl]<nint, int> RunApp => field != null ? field : field = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(handle, "hostfxr_run_app");
+    public unsafe delegate* unmanaged[Cdecl]<delegate* unmanaged[Cdecl]<byte*, void>, delegate* unmanaged[Cdecl]<byte*, void>> SetErrorWriter => field != null ? field : field = (delegate* unmanaged[Cdecl]<delegate* unmanaged[Cdecl]<byte*, void>, delegate* unmanaged[Cdecl]<byte*, void>>)NativeLibrary.GetExport(handle, "hostfxr_set_error_writer");
+    public unsafe delegate* unmanaged[Cdecl]<nint, byte*, byte*, int> SetRuntimePropertyValue => field != null ? field : field = (delegate* unmanaged[Cdecl]<nint, byte*, byte*, int>)NativeLibrary.GetExport(handle, "hostfxr_set_runtime_property_value");
 
-    public unsafe delegate* unmanaged[Cdecl]<int, byte**, InitializeParametersStruct*, out nint, int> InitializeForDotnetCommandLine => field == null
-        ? field = (delegate* unmanaged[Cdecl]<int, byte**, InitializeParametersStruct*, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_initialize_for_dotnet_command_line")
-        : field;
-    public unsafe delegate* unmanaged[Cdecl]<byte*, InitializeParametersStruct*, out nint, int> InitializeForRuntimeConfig => field == null
-        ? field = (delegate* unmanaged[Cdecl]<byte*, InitializeParametersStruct*, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_initialize_for_runtime_config")
-        : field;
-    public unsafe delegate* unmanaged[Cdecl]<nint, int> RunApp => field == null
-        ? field = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_run_app")
-        : field;
-    public unsafe delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int> GetRuntimeDelegate => field == null
-        ? field = (delegate* unmanaged[Cdecl]<nint, DelegateType, out nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_get_runtime_delegate")
-        : field;
-    public unsafe delegate* unmanaged[Cdecl]<nint, int> Close => field == null
-        ? field = (delegate* unmanaged[Cdecl]<nint, int>)NativeLibrary.GetExport(_handle, "hostfxr_close")
-        : field;
+    internal static Encoding Encoding => field ??=
+#if NETFRAMEWORK
+        Encoding.Unicode;
+#else
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? Encoding.Unicode
+            : Encoding.UTF8;
+#endif
 
-    private void Dispose(bool disposing)
+    internal static string? PtrToString(nint ptr)
     {
-        if (!_disposedValue)
+#if !NETFRAMEWORK
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+#endif
         {
-            if (disposing)
-            {
-            }
-
-            NativeLibrary.Free(_handle);
-            _disposedValue = true;
+            return Marshal.PtrToStringUni(ptr);
         }
+#if !NETFRAMEWORK
+        else
+        {
+#if NETSTANDARD2_0
+            return Marshal.PtrToStringAnsi(ptr);
+#else
+            return Marshal.PtrToStringUTF8(ptr);
+#endif
+        }
+#endif
     }
 
-    ~HostFxr()
+    internal static readonly int CharSize =
+#if NETFRAMEWORK
+        sizeof(char);
+#else
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? sizeof(char)
+            : sizeof(byte);
+#endif
+
+    public HostFxr(string hostfxrPath)
+        : this(NativeLibrary.Load(hostfxrPath))
     {
-        // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-        Dispose(disposing: false);
     }
 
-    public void Dispose()
+    /// <inheritdoc/>
+    protected override bool ReleaseHandle()
     {
-        // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        NativeLibrary.Free(handle);
+        return true;
     }
 }
-
-
-#if NETFRAMEWORK || NETSTANDARD
-file static class NativeLibrary
-{
-    public static nint Load(string libraryPath)
-    {
-#if !NETFRAMEWORK
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
-            return LoadLibraryW(libraryPath);
-#if !NETFRAMEWORK
-        else
-            return dlopen(libraryPath, 2);
-
-        [DllImport("libdl", SetLastError = true)]
-        static extern nint dlopen(string fileName, int flags);
-#endif
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-        static extern nint LoadLibraryW(string lpFileName);
-    }
-
-    public static void Free(nint handle)
-    {
-#if !NETFRAMEWORK
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
-            FreeLibrary(handle);
-#if !NETFRAMEWORK
-        else
-            dlclose(handle);
-
-        [DllImport("libdl", SetLastError = true)]
-        static extern int dlclose(nint handle);
-#endif
-        [DllImport("kernel32", SetLastError = true)]
-        static extern bool FreeLibrary(nint hModule);
-
-    }
-
-    public static nint GetExport(nint handle, string name)
-    {
-
-#if !NETFRAMEWORK
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
-            return GetProcAddress(handle, name);
-#if !NETFRAMEWORK
-        else
-            return dlsym(handle, name);
-
-        [DllImport("libdl", SetLastError = true)]
-        static extern nint dlsym(nint handle, string symbol);
-#endif
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-        static extern nint GetProcAddress(nint hModule, string lpProcName);
-    }
-}
-#endif
